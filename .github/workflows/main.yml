@@ -1,0 +1,26 @@
+on:
+  push:
+    tags:
+      - v*.**
+jobs:
+  package-contents:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create tar files
+        run: 
+          tar -czvf MikroTik.tar -C src/splunk-app .
+          tar -czvf MikroTik.spl MikroTik.tar
+          tar -czvf device-scripts.tar -C src/mikrotik-scripts .
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: |
+            *.tar
+        
+  create-release:
+    needs: package-contents
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release
+        run: echo "hello"
