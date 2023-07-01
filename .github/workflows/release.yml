@@ -1,0 +1,37 @@
+on:
+  push:
+    tags:
+      - v*.**
+jobs:
+  package-contents:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Create MikroTik.tar of Splunk app contents
+        run: 
+          cd src/splunk-app
+          tar -cvf ../../MikroTik.tar .
+          cd ../..
+      - name: Create MikroTik.spl which is the Splunk app format
+        run: 
+          tar -czvf MikroTik.spl MikroTik.tar
+      - name: Create device-scripts.tar of scripts for each MT device
+        run:
+          cd src/mikrotik-scripts
+          tar -czvf ../../device-scripts.tar.gz .
+          cd ../..
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: |
+            MikroTik.spl
+            device-scripts.tar.gz
+        
+  create-release:
+    needs: package-contents
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release
+        run: echo "hello"
